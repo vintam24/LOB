@@ -14,7 +14,7 @@ class UnitTest extends TestCase
     use RefreshDatabase;
     public function test_example(): void
     {
-        $response = $this->postJson('/api/send-claim');
+        $response = $this->postJson('/api/unit-testing');
         $response->assertStatus(200);
         $this->assertDatabaseHas('rekap_klaim', ['LOB' => 'KUR']);
     }

@@ -63,21 +63,21 @@ class KlaimController extends Controller
     }
 
     public function unitTesting()
-{
-    $data = Klaim::whereIn('sub_cob', ['KUR', 'PEN'])->get();
+    {
+        $data = Klaim::whereIn('sub_cob', ['KUR', 'PEN'])->get();
 
-    foreach ($data as $item) {
-        DB::connection('mysql2')->table('rekap_klaim')->insert([
-            'LOB' => $item->sub_cob,
-            'penyebab_klaim' => $item->penyebab_klaim,
-            'periode' => $item->periode,
-            'nilai_beban_klaim' => $item->nilai_beban_klaim,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        foreach ($data as $item) {
+            DB::connection('mysql2')->table('rekap_klaim')->insert([
+                'LOB' => $item->sub_cob,
+                'penyebab_klaim' => $item->penyebab_klaim,
+                'periode' => $item->periode,
+                'nilai_beban_klaim' => $item->nilai_beban_klaim,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        return response()->json(['message' => 'Data successfully inserted']);
     }
-
-    return response()->json(['message' => 'Data successfully inserted']);
-}
 
 }
