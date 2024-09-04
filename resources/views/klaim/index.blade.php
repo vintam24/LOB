@@ -8,6 +8,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <style>
+        .leftside {
+            text-align: left;
+        }
+
+        .rightside {
+            text-align: right;
+        }
+
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
             border-radius: 50%;
@@ -38,26 +46,47 @@
         </div>
         
         <div class="overflow-x-auto">
-            <table class="min-w-full bg-white shadow-md rounded-lg">
-                <thead class="bg-gray-200">
+
+            <table class="min-w-full bg-white border border-gray-300">
+                <thead>
                     <tr>
-                        <th class="py-2 px-4 border-b">LOB</th>
-                        <th class="py-2 px-4 border-b">Penyebab Klaim</th>
-                        <th class="py-2 px-4 border-b">Periode</th>
-                        <th class="py-2 px-4 border-b">Nilai Beban Klaim</th>
+                        <th class="py-2 border border-gray-300">LOB</th>
+                        <th class="py-2 border border-gray-300">Penyebab Klaim</th>
+                        <th class="py-2 border border-gray-300">Jumlah Nasabah</th>
+                        <th class="py-2 border border-gray-300">Beban Klaim</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($klaim as $item)
-                    <tr>
-                        <td class="py-2 px-4 border-b">{{ $item->sub_cob }}</td>
-                        <td class="py-2 px-4 border-b">{{ $item->penyebab_klaim }}</td>
-                        <td class="py-2 px-4 border-b">{{ $item->periode }}</td>
-                        <td class="py-2 px-4 border-b">{{ number_format($item->nilai_beban_klaim, 2) }}</td>
-                    </tr>
+                    @foreach ($groupedKlaim as $lob => $items)
+                        @php
+                            $subtotal_nasabah = $items->sum('jumlah_nasabah');
+                            $subtotal_beban_klaim = $items->sum('beban_klaim');
+                        @endphp
+                        
+                        @foreach ($items as $item)
+                            <tr class="border border-gray-300">
+                                <td class="border border-gray-300">{{ $item->sub_cob }}</td>
+                                <td class="border border-gray-300">{{ $item->penyebab_klaim }}</td>
+                                <td class="border border-gray-300 rightside">{{ $item->jumlah_nasabah }}</td>
+                                <td class="border border-gray-300 rightside">{{ number_format($item->beban_klaim, 2) }}</td>
+                            </tr>
+                        @endforeach
+
+                        <tr class="bg-blue-600 text-white border border-gray-300">
+                            <td colspan="2" class="border border-gray-300">Subtotal {{ $lob }}</td>
+                            <td class="border border-gray-300 rightside">{{ $subtotal_nasabah }}</td>
+                            <td class="border border-gray-300 rightside">{{ number_format($subtotal_beban_klaim, 2) }}</td>
+                        </tr>
                     @endforeach
+
+                    <tr class="bg-gray-600 text-white border border-gray-300">
+                        <td colspan="2" class="border border-gray-300">Total</td>
+                        <td class="border border-gray-300 rightside">{{ $totals['jumlah_nasabah'] }}</td>
+                        <td class="border border-gray-300 rightside">{{ number_format($totals['beban_klaim'], 2) }}</td>
+                    </tr>
                 </tbody>
             </table>
+
         </div>
     </div>
 
@@ -82,7 +111,7 @@
                         _token: '{{ csrf_token() }}',
                     },
                     success: function(response) {
-                        $('#popup-message').text('Data backup completed successfully!');
+                        $('#popup-message').text(response.message);
                         $('#popup-modal').removeClass('hidden');
                     },
                     error: function(xhr) {
